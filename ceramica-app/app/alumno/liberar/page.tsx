@@ -65,7 +65,7 @@ export default function LiberarPage() {
       }
 
       const { data } = await query;
-      setSessions((data as Session[]) ?? []);
+      setSessions((data as unknown as Session[]) ?? []);
       setLoading(false);
     }
 
