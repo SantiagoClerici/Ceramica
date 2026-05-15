@@ -84,7 +84,12 @@ export default function AlumnoDashboard() {
       .order("date")
       .limit(8);
 
-    setSessions((sessionsData as Session[]) ?? []);
+    setSessions(
+      ((sessionsData as any[]) ?? []).map((s) => ({
+        ...s,
+        course: Array.isArray(s.course) ? s.course[0] ?? null : s.course,
+      })) as Session[]
+    );
 
     // Créditos disponibles: releases - recoveries usadas
     const { count: totalReleases } = await supabase
