@@ -84,7 +84,7 @@ export default function AlumnoDashboard() {
       .order("date")
       .limit(8);
 
-    setSessions((sessionsData as Session[]) ?? []);
+    setSessions((sessionsData as unknown as Session[]) ?? []);
 
     // Créditos disponibles: releases - recoveries usadas
     const { count: totalReleases } = await supabase
