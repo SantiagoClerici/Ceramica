@@ -69,7 +69,13 @@ export default function ProfesorDashboard() {
       )
       .order("created_at");
 
-    setPending((pendingData as PendingEnrollment[]) ?? []);
+    setPending(
+      ((pendingData as any[]) ?? []).map((p) => ({
+        ...p,
+        student: Array.isArray(p.student) ? p.student[0] ?? null : p.student,
+        course: Array.isArray(p.course) ? p.course[0] ?? null : p.course,
+      })) as PendingEnrollment[]
+    );
     setLoadingCourses(false);
   }
 

@@ -70,7 +70,22 @@ export default function RecuperarPage() {
       .is("recoveries.id", null) // solo las no usadas
       .order("released_at");
 
-    setReleases((releasesData as Release[]) ?? []);
+    setReleases(
+      ((releasesData as any[]) ?? []).map((r) => {
+        const sessionObj = Array.isArray(r.session) ? r.session[0] : r.session;
+        return {
+          ...r,
+          session: sessionObj
+            ? {
+                ...sessionObj,
+                course: Array.isArray(sessionObj.course)
+                  ? sessionObj.course[0] ?? null
+                  : sessionObj.course,
+              }
+            : null,
+        };
+      }) as Release[]
+    );
 
     // Sesiones de OTROS cursos con cupo, desde hoy
     const today = new Date().toISOString().slice(0, 10);
@@ -90,11 +105,15 @@ export default function RecuperarPage() {
     }
 
     const { data: sessionsRaw } = await query;
+    const mappedSessionsRaw = ((sessionsRaw as any[]) ?? []).map((s) => ({
+      ...s,
+      course: Array.isArray(s.course) ? s.course[0] ?? null : s.course,
+    }));
 
     // Calcular cupo disponible para cada sesión
     const sessionsWithCapacity: AvailableSession[] = [];
 
-    for (const s of (sessionsRaw ?? []) as AvailableSession[]) {
+    for (const s of mappedSessionsRaw as AvailableSession[]) {
       const { data } = await supabase
         .rpc("session_available_capacity", { p_session_id: s.id });
       if ((data ?? 0) > 0) {
